@@ -1,10 +1,13 @@
 const { createServer } = require('http');
 const { Server } = require('ws');
 const express = require('express');
+const path = require('path');
 
 const app = express();
 const server = createServer(app);
 const wss = new Server({ server });
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 wss.on('connection', (ws) => {
     ws.on('message', (message) => {
