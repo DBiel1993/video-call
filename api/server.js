@@ -1,15 +1,23 @@
-const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 8080 });
+const { createServer } = require('http');
+const { Server } = require('ws');
+const express = require('express');
 
-server.on('connection', socket => {
-    socket.on('message', message => {
-        // Broadcast the message to all other connected clients
-        server.clients.forEach(client => {
-            if (client !== socket && client.readyState === WebSocket.OPEN) {
+const app = express();
+const server = createServer(app);
+const wss = new Server({ server });
+
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => {
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(message);
             }
         });
     });
 });
 
-console.log('Signaling server running on ws://localhost:8080');
+server.listen(8080, () => {
+    console.log('Signaling server running on ws://localhost:8080');
+});
+
+module.exports = app;
